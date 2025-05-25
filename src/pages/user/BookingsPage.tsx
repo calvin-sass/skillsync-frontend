@@ -1,0 +1,230 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { apiGetUserBookings, apiGetServiceById } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import type { BookingDto } from '../../types';
+import BookingActions from '../../components/bookings/BookingActions';
+
+interface ExtendedBooking extends BookingDto {
+  serviceName?: string;
+  serviceImage?: string;
+  sellerName?: string;
+  price?: number;
+}
+
+const BookingsPage: React.FC = () => {
+  // Filter options
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { user } = useAuth();
+  
+  // Fetch user bookings
+  const { data: bookings = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['userBookings'],
+    queryFn: apiGetUserBookings,
+    enabled: !!user,
+  });
+
+  // Enhance bookings with service details
+  const { data: enhancedBookings = [] } = useQuery({
+    queryKey: ['enhancedBookings', bookings],
+    queryFn: async () => {
+      if (!bookings.length) return [];
+      
+      const enhancedBookingsData: ExtendedBooking[] = [];
+      
+      for (const booking of bookings) {
+        try {
+          // Get service details for each booking
+          const service = await apiGetServiceById(booking.serviceId);
+          
+          enhancedBookingsData.push({
+            ...booking,
+            serviceName: service.title,
+            serviceImage: service.images && service.images.length > 0 ? service.images[0].imageUrl : undefined,
+            sellerName: service.sellerUsername,
+            price: service.price
+          });
+        } catch (err) {
+          console.error(`Error fetching details for booking ${booking.id}:`, err);
+          enhancedBookingsData.push(booking);
+        }
+      }
+      
+      return enhancedBookingsData;
+    },
+    enabled: bookings.length > 0
+  });
+
+  // Filter bookings based on status
+  const filteredBookings = statusFilter === 'all'
+    ? enhancedBookings
+    : enhancedBookings.filter(booking => booking.status.toLowerCase() === statusFilter);
+
+  // Helper function to get status badge style
+  const getStatusBadgeClass = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'in progress':
+      case 'accepted':
+        return 'bg-blue-100 text-blue-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Helper function to format status label for display
+  const formatStatus = (status: string) => {
+    return status.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  };
+  
+  const handleActionComplete = () => {
+    refetch();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-200 border-t-primary-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center py-12">
+          <svg className="mx-auto h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">Error loading bookings</h3>
+          <p className="mt-1 text-gray-500">
+            {error instanceof Error ? error.message : 'Failed to load your bookings. Please try again.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">My Bookings</h1>
+        <div className="mt-3 sm:mt-0 sm:ml-4">
+          <label htmlFor="status-filter" className="sr-only">
+            Filter by status
+          </label>
+          <select
+            id="status-filter"
+            name="status-filter"
+            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Bookings</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      {filteredBookings.length > 0 ? (
+        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <ul className="divide-y divide-gray-200">
+            {filteredBookings.map((booking) => (
+              <li key={booking.id}>
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden">
+                        <img
+                          src={booking.serviceImage || 'https://via.placeholder.com/150?text=No+Image'}
+                          alt={booking.serviceName || `Service ID: ${booking.serviceId}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-primary-600">
+                          <Link to={`/services/${booking.serviceId}`} className="hover:underline">
+                            {booking.serviceName || `Service ID: ${booking.serviceId}`}
+                          </Link>
+                        </div>
+                        {booking.sellerName && (
+                          <div className="mt-1 flex items-center text-sm text-gray-500">
+                            <span>by </span>
+                            <span className="ml-1 text-primary-600">
+                              {booking.sellerName}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="ml-2 flex-shrink-0 flex flex-col items-end">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(booking.status)}`}>
+                        {formatStatus(booking.status)}
+                      </span>
+                      {booking.price && (
+                        <span className="mt-1 text-sm font-medium text-gray-900">${booking.price.toFixed(2)}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-4 sm:flex sm:justify-between">
+                    <div className="sm:flex">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                        </svg>
+                        <span>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-end sm:mt-0">
+                      <BookingActions 
+                        bookingId={booking.id}
+                        bookingStatus={booking.status}
+                        bookingPrice={booking.price}
+                        serviceId={booking.serviceId}
+                        onComplete={handleActionComplete}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <div className="bg-white shadow sm:rounded-lg p-10 text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M12 18v-6M8 18v-1m8 1v-3" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {statusFilter === 'all' 
+              ? "You haven't made any bookings yet." 
+              : `You don't have any ${statusFilter} bookings.`}
+          </p>
+          <div className="mt-6">
+            <Link
+              to="/services"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              Browse Services
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BookingsPage; 
