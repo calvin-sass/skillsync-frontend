@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ResetPasswordPage: React.FC = () => {
   const { resetPassword, error, isLoading } = useAuth();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [formData, setFormData] = useState({
-    email: searchParams.get('email') || '',
-    token: searchParams.get('token') || '',
-    password: '',
-    confirmPassword: '',
+    email: searchParams.get("email") || "",
+    token: searchParams.get("token") || "",
+    password: "",
+    confirmPassword: "",
   });
-  
+
   const [formErrors, setFormErrors] = useState({
-    email: '',
-    token: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    token: "",
+    password: "",
+    confirmPassword: "",
   });
-  
+
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
@@ -28,8 +27,8 @@ const ResetPasswordPage: React.FC = () => {
     if (!formData.email || !formData.token) {
       setFormErrors({
         ...formErrors,
-        email: !formData.email ? 'Email is required' : '',
-        token: !formData.token ? 'Reset token is missing' : '',
+        email: !formData.email ? "Email is required" : "",
+        token: !formData.token ? "Reset token is missing" : "",
       });
     }
   }, []);
@@ -40,51 +39,51 @@ const ResetPasswordPage: React.FC = () => {
       ...formData,
       [name]: value,
     });
-    
+
     // Clear errors when typing
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors({
         ...formErrors,
-        [name]: '',
+        [name]: "",
       });
     }
   };
 
   const validateForm = (): boolean => {
     const errors = {
-      email: '',
-      token: '',
-      password: '',
-      confirmPassword: '',
+      email: "",
+      token: "",
+      password: "",
+      confirmPassword: "",
     };
     let isValid = true;
 
     if (!formData.email) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email is invalid';
+      errors.email = "Email is invalid";
       isValid = false;
     }
 
     if (!formData.token) {
-      errors.token = 'Reset token is missing';
+      errors.token = "Reset token is missing";
       isValid = false;
     }
 
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
       isValid = false;
     } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+      errors.password = "Password must be at least 6 characters";
       isValid = false;
     }
 
     if (!formData.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
+      errors.confirmPassword = "Please confirm your password";
       isValid = false;
     } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+      errors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
 
@@ -94,17 +93,17 @@ const ResetPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       await resetPassword(formData.email, formData.token, formData.password);
       setFormSubmitted(true);
     } catch (err) {
       // Error handling is done in the AuthContext
-      console.error('Failed to reset password:', err);
+      console.error("Failed to reset password:", err);
     }
   };
 
@@ -112,9 +111,12 @@ const ResetPasswordPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Password reset successful</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Password reset successful
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Your password has been reset successfully. You can now log in with your new password.
+            Your password has been reset successfully. You can now log in with
+            your new password.
           </p>
           <div className="mt-6 text-center">
             <Link
@@ -132,7 +134,9 @@ const ResetPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Reset your password</h2>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Reset your password
+        </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Enter your new password below
         </p>
@@ -144,8 +148,17 @@ const ResetPasswordPage: React.FC = () => {
             <div className="rounded-md bg-red-50 p-4 mb-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div className="ml-3">
@@ -160,16 +173,29 @@ const ResetPasswordPage: React.FC = () => {
             <div className="rounded-md bg-red-50 p-4 mb-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Invalid reset link</h3>
+                  <h3 className="text-sm font-medium text-red-800">
+                    Invalid reset link
+                  </h3>
                   <div className="mt-2 text-sm text-red-700">
                     {formErrors.email && <p>{formErrors.email}</p>}
                     {formErrors.token && <p>{formErrors.token}</p>}
-                    <p className="mt-1">Please check your reset link or request a new one.</p>
+                    <p className="mt-1">
+                      Please check your reset link or request a new one.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -178,7 +204,10 @@ const ResetPasswordPage: React.FC = () => {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 New password
               </label>
               <div className="mt-1">
@@ -191,7 +220,7 @@ const ResetPasswordPage: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className={`appearance-none block w-full px-3 py-2 border ${
-                    formErrors.password ? 'border-red-300' : 'border-gray-300'
+                    formErrors.password ? "border-red-300" : "border-gray-300"
                   } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                 />
                 {formErrors.password && (
@@ -203,7 +232,10 @@ const ResetPasswordPage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirm password
               </label>
               <div className="mt-1">
@@ -216,11 +248,16 @@ const ResetPasswordPage: React.FC = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={`appearance-none block w-full px-3 py-2 border ${
-                    formErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                    formErrors.confirmPassword
+                      ? "border-red-300"
+                      : "border-gray-300"
                   } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                 />
                 {formErrors.confirmPassword && (
-                  <p className="mt-2 text-sm text-red-600" id="confirm-password-error">
+                  <p
+                    className="mt-2 text-sm text-red-600"
+                    id="confirm-password-error"
+                  >
                     {formErrors.confirmPassword}
                   </p>
                 )}
@@ -233,7 +270,7 @@ const ResetPasswordPage: React.FC = () => {
                 disabled={isLoading || !!formErrors.email || !!formErrors.token}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
               >
-                {isLoading ? 'Resetting password...' : 'Reset password'}
+                {isLoading ? "Resetting password..." : "Reset password"}
               </button>
             </div>
           </form>
@@ -273,4 +310,4 @@ const ResetPasswordPage: React.FC = () => {
   );
 };
 
-export default ResetPasswordPage; 
+export default ResetPasswordPage;

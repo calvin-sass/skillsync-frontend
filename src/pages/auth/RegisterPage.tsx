@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface FormData {
   email: string;
@@ -25,32 +25,33 @@ interface FormErrors {
 }
 
 const RegisterPage: React.FC = () => {
-  const navigate = useNavigate();
   const { requestSignupCode, error: authError, clearError } = useAuth();
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    username: '',
-    firstName: '',
-    lastName: '',
-    role: 'User', // Default role
+    email: "",
+    password: "",
+    confirmPassword: "",
+    username: "",
+    firstName: "",
+    lastName: "",
+    role: "User", // Default role
     acceptTerms: false,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     });
 
     // Clear error when typing
@@ -68,7 +69,7 @@ const RegisterPage: React.FC = () => {
 
     // Clear error message
     if (errorMessage) {
-      setErrorMessage('');
+      setErrorMessage("");
     }
   };
 
@@ -78,28 +79,28 @@ const RegisterPage: React.FC = () => {
 
     // Email validation
     if (!formData.email) {
-      stepErrors.email = 'Email is required';
+      stepErrors.email = "Email is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      stepErrors.email = 'Email is invalid';
+      stepErrors.email = "Email is invalid";
       isValid = false;
     }
 
     // Password validation
     if (!formData.password) {
-      stepErrors.password = 'Password is required';
+      stepErrors.password = "Password is required";
       isValid = false;
     } else if (formData.password.length < 6) {
-      stepErrors.password = 'Password must be at least 6 characters';
+      stepErrors.password = "Password must be at least 6 characters";
       isValid = false;
     }
 
     // Confirm password validation
     if (!formData.confirmPassword) {
-      stepErrors.confirmPassword = 'Please confirm your password';
+      stepErrors.confirmPassword = "Please confirm your password";
       isValid = false;
     } else if (formData.password !== formData.confirmPassword) {
-      stepErrors.confirmPassword = 'Passwords do not match';
+      stepErrors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
 
@@ -113,22 +114,22 @@ const RegisterPage: React.FC = () => {
 
     // Username validation
     if (!formData.username) {
-      stepErrors.username = 'Username is required';
+      stepErrors.username = "Username is required";
       isValid = false;
     } else if (formData.username.length < 3) {
-      stepErrors.username = 'Username must be at least 3 characters';
+      stepErrors.username = "Username must be at least 3 characters";
       isValid = false;
     }
 
     // Role validation
     if (!formData.role) {
-      stepErrors.role = 'Please select a role';
+      stepErrors.role = "Please select a role";
       isValid = false;
     }
 
     // Terms validation
     if (!formData.acceptTerms) {
-      stepErrors.acceptTerms = 'You must accept the terms and conditions';
+      stepErrors.acceptTerms = "You must accept the terms and conditions";
       isValid = false;
     }
 
@@ -160,7 +161,7 @@ const RegisterPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
       // Only send fields that backend expects
@@ -168,12 +169,14 @@ const RegisterPage: React.FC = () => {
         email: formData.email,
         username: formData.username,
         password: formData.password,
-        role: formData.role
+        role: formData.role,
       });
-      
+
       // Navigation happens in the AuthContext after successful API call
     } catch (err) {
-      setErrorMessage((err as Error).message || 'Failed to register. Please try again.');
+      setErrorMessage(
+        (err as Error).message || "Failed to register. Please try again."
+      );
       setIsSubmitting(false);
     }
   };
@@ -181,10 +184,15 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+          Or{" "}
+          <Link
+            to="/login"
+            className="font-medium text-primary-600 hover:text-primary-500"
+          >
             sign in to your existing account
           </Link>
         </p>
@@ -196,17 +204,33 @@ const RegisterPage: React.FC = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className={`flex items-center justify-center h-8 w-8 rounded-full ${step >= 1 ? 'bg-primary-600' : 'bg-gray-300'} text-white`}>
+                <div
+                  className={`flex items-center justify-center h-8 w-8 rounded-full ${
+                    step >= 1 ? "bg-primary-600" : "bg-gray-300"
+                  } text-white`}
+                >
                   1
                 </div>
-                <div className="ml-2 text-sm font-medium text-gray-700">Account</div>
+                <div className="ml-2 text-sm font-medium text-gray-700">
+                  Account
+                </div>
               </div>
-              <div className={`h-0.5 w-12 ${step >= 2 ? 'bg-primary-600' : 'bg-gray-300'}`} />
+              <div
+                className={`h-0.5 w-12 ${
+                  step >= 2 ? "bg-primary-600" : "bg-gray-300"
+                }`}
+              />
               <div className="flex items-center">
-                <div className={`flex items-center justify-center h-8 w-8 rounded-full ${step >= 2 ? 'bg-primary-600' : 'bg-gray-300'} text-white`}>
+                <div
+                  className={`flex items-center justify-center h-8 w-8 rounded-full ${
+                    step >= 2 ? "bg-primary-600" : "bg-gray-300"
+                  } text-white`}
+                >
                   2
                 </div>
-                <div className="ml-2 text-sm font-medium text-gray-700">Profile</div>
+                <div className="ml-2 text-sm font-medium text-gray-700">
+                  Profile
+                </div>
               </div>
             </div>
           </div>
@@ -215,7 +239,11 @@ const RegisterPage: React.FC = () => {
             <div className="mb-4 rounded-md bg-red-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -224,7 +252,9 @@ const RegisterPage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-red-800">{errorMessage || authError}</p>
+                  <p className="text-sm font-medium text-red-800">
+                    {errorMessage || authError}
+                  </p>
                 </div>
               </div>
             </div>
@@ -234,7 +264,10 @@ const RegisterPage: React.FC = () => {
             {step === 1 && (
               <>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email address
                   </label>
                   <div className="mt-1">
@@ -247,15 +280,22 @@ const RegisterPage: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.email ? 'border-red-300' : 'border-gray-300'
+                        errors.email ? "border-red-300" : "border-gray-300"
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                     />
-                    {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
+                    {errors.email && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Password
                   </label>
                   <div className="mt-1">
@@ -268,15 +308,22 @@ const RegisterPage: React.FC = () => {
                       value={formData.password}
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.password ? 'border-red-300' : 'border-gray-300'
+                        errors.password ? "border-red-300" : "border-gray-300"
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                     />
-                    {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password}</p>}
+                    {errors.password && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.password}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Confirm Password
                   </label>
                   <div className="mt-1">
@@ -289,10 +336,16 @@ const RegisterPage: React.FC = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                        errors.confirmPassword
+                          ? "border-red-300"
+                          : "border-gray-300"
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                     />
-                    {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>}
+                    {errors.confirmPassword && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -311,7 +364,10 @@ const RegisterPage: React.FC = () => {
             {step === 2 && (
               <>
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Username
                   </label>
                   <div className="mt-1">
@@ -324,15 +380,22 @@ const RegisterPage: React.FC = () => {
                       value={formData.username}
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.username ? 'border-red-300' : 'border-gray-300'
+                        errors.username ? "border-red-300" : "border-gray-300"
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                     />
-                    {errors.username && <p className="mt-2 text-sm text-red-600">{errors.username}</p>}
+                    {errors.username && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.username}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     First Name (optional)
                   </label>
                   <div className="mt-1">
@@ -349,7 +412,10 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Last Name (optional)
                   </label>
                   <div className="mt-1">
@@ -366,7 +432,10 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="role"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Account Type
                   </label>
                   <div className="mt-1">
@@ -376,14 +445,20 @@ const RegisterPage: React.FC = () => {
                       value={formData.role}
                       onChange={handleChange}
                       className={`appearance-none block w-full px-3 py-2 border ${
-                        errors.role ? 'border-red-300' : 'border-gray-300'
+                        errors.role ? "border-red-300" : "border-gray-300"
                       } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                       required
                     >
-                      <option value="User">User (I want to hire services)</option>
-                      <option value="Seller">Seller (I want to offer services)</option>
+                      <option value="User">
+                        User (I want to hire services)
+                      </option>
+                      <option value="Seller">
+                        Seller (I want to offer services)
+                      </option>
                     </select>
-                    {errors.role && <p className="mt-2 text-sm text-red-600">{errors.role}</p>}
+                    {errors.role && (
+                      <p className="mt-2 text-sm text-red-600">{errors.role}</p>
+                    )}
                   </div>
                 </div>
 
@@ -396,11 +471,24 @@ const RegisterPage: React.FC = () => {
                     onChange={handleChange}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
-                    I accept the <Link to="/terms" className="text-primary-600 hover:text-primary-500">Terms and Conditions</Link>
+                  <label
+                    htmlFor="acceptTerms"
+                    className="ml-2 block text-sm text-gray-900"
+                  >
+                    I accept the{" "}
+                    <Link
+                      to="/terms"
+                      className="text-primary-600 hover:text-primary-500"
+                    >
+                      Terms and Conditions
+                    </Link>
                   </label>
                 </div>
-                {errors.acceptTerms && <p className="mt-2 text-sm text-red-600">{errors.acceptTerms}</p>}
+                {errors.acceptTerms && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.acceptTerms}
+                  </p>
+                )}
 
                 <div className="flex space-x-3">
                   <button
@@ -415,7 +503,7 @@ const RegisterPage: React.FC = () => {
                     disabled={isSubmitting}
                     className="w-2/3 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                   >
-                    {isSubmitting ? 'Registering...' : 'Register'}
+                    {isSubmitting ? "Registering..." : "Register"}
                   </button>
                 </div>
               </>
@@ -427,4 +515,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage; 
+export default RegisterPage;

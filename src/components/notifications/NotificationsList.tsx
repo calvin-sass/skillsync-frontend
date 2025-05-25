@@ -1,14 +1,20 @@
-import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiGetNotifications, apiMarkNotificationAsRead } from '../../services/api';
-import type { Notification } from '../../types';
+import React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  apiGetNotifications,
+  apiMarkNotificationAsRead,
+} from "../../services/api";
 
 const NotificationsList: React.FC = () => {
   const queryClient = useQueryClient();
 
   // Fetch user notifications
-  const { data: notifications = [], isLoading, error } = useQuery({
-    queryKey: ['notifications'],
+  const {
+    data: notifications = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["notifications"],
     queryFn: apiGetNotifications,
   });
 
@@ -16,7 +22,7 @@ const NotificationsList: React.FC = () => {
   const markAsReadMutation = useMutation({
     mutationFn: (id: number) => apiMarkNotificationAsRead(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 
@@ -27,7 +33,7 @@ const NotificationsList: React.FC = () => {
   // Format date to a readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
   if (isLoading) {
@@ -60,11 +66,17 @@ const NotificationsList: React.FC = () => {
         <div
           key={notification.id}
           className={`p-4 rounded-md ${
-            notification.isRead ? 'bg-white' : 'bg-blue-50'
+            notification.isRead ? "bg-white" : "bg-blue-50"
           } border border-gray-200 shadow-sm`}
         >
           <div className="flex justify-between items-start">
-            <p className={`text-sm ${notification.isRead ? 'text-gray-600' : 'text-gray-900 font-medium'}`}>
+            <p
+              className={`text-sm ${
+                notification.isRead
+                  ? "text-gray-600"
+                  : "text-gray-900 font-medium"
+              }`}
+            >
               {notification.message}
             </p>
             {!notification.isRead && (
@@ -77,7 +89,9 @@ const NotificationsList: React.FC = () => {
             )}
           </div>
           <div className="mt-1">
-            <span className="text-xs text-gray-500">{formatDate(notification.createdAt)}</span>
+            <span className="text-xs text-gray-500">
+              {formatDate(notification.createdAt)}
+            </span>
           </div>
         </div>
       ))}
@@ -85,4 +99,4 @@ const NotificationsList: React.FC = () => {
   );
 };
 
-export default NotificationsList; 
+export default NotificationsList;
