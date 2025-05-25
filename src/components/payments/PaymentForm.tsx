@@ -44,7 +44,7 @@ const PaymentFormContent: React.FC<PaymentFormProps> = ({
   // The backend still requires this parameter
   const returnUrl = typeof window !== 'undefined' 
     ? `${window.location.origin}/payment-return` 
-    : 'http://localhost:5173/payment-return';
+    : 'https://skillsyncsa.netlify.app/payment-return';
 
   const paymentMutation = useMutation({
     mutationFn: (paymentData: PaymentCreateDto) => 
