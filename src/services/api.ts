@@ -19,7 +19,7 @@ import type {
 // Create API instance
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  "https://skillsyncsa-api-h7gdg3dpbvgbhvat.germanywestcentral-01.azurewebsites.net/api";
+  "http://ec2-13-61-104-235.eu-north-1.compute.amazonaws.com:5001/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
