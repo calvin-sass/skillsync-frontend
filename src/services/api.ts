@@ -18,7 +18,8 @@ import type {
 
 // Create API instance
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://app.calvinsass.com/api";
+  import.meta.env.VITE_API_URL ||
+  "https://ec2-13-61-104-235.eu-north-1.compute.amazonaws.com/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
